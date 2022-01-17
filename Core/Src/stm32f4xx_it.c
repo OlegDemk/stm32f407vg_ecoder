@@ -27,6 +27,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 extern int klick;
+
+int tim_val = 0;
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -205,7 +207,8 @@ void SysTick_Handler(void)
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-	HAL_TIM_Base_Start_IT(&htim7);
+	HAL_TIM_Base_Start_IT(&htim7);								//	Turn on Timer with 100Hz period = 0,01 sec
+
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(PC15_OSC32_OUT_Pin);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
@@ -221,21 +224,67 @@ void TIM7_IRQHandler(void)
   /* USER CODE BEGIN TIM7_IRQn 0 */
 	//HAL_GPIO_TogglePin(GPIOD, LD5_Pin);
 
-
-	if(HAL_GPIO_ReadPin(GPIOE, encoder_button_Pin) == 0)	// If button pressed
+	if(tim_val == 4)											// Waiting 3 period of timer7: (0,01 *3 = 0,03 second)
 	{
-		klick++;
-		if(klick >= 4)
+		tim_val = 0;
+		if(HAL_GPIO_ReadPin(GPIOE, encoder_button_Pin) == 0)	// If button steel pressed
 		{
-			klick = 0;
-			HAL_TIM_Base_Stop_IT(&htim7);
+			klick++;
+			if(klick >= 4)										// it mean we have only 4 LEDs
+			{
+				klick = 0;
+				HAL_TIM_Base_Stop_IT(&htim7);					// Stop timer (becouse counter can turn on only encoder key)
+			}
+			else
+			{
+				HAL_TIM_Base_Stop_IT(&htim7);
+			}
 		}
-		else
-		{
-			HAL_TIM_Base_Stop_IT(&htim7);
-		}
+		HAL_TIM_Base_Stop_IT(&htim7);
 	}
-	HAL_TIM_Base_Stop_IT(&htim7);
+	else
+	{
+		tim_val++;
+	}
+
+
+
+//	//if(TIM7->TIMx_CNT > 100)
+//	if(__HAL_TIM_GET_COUNTER(&htim7) > 100)
+//	{
+//		if(HAL_GPIO_ReadPin(GPIOE, encoder_button_Pin) == 0)	// If button pressed
+//		{
+//			klick++;
+//			if(klick >= 4)
+//			{
+//				klick = 0;
+//				HAL_TIM_Base_Stop_IT(&htim7);
+//			}
+//			else
+//			{
+//				HAL_TIM_Base_Stop_IT(&htim7);
+//			}
+//
+//		}
+//		HAL_TIM_Base_Stop_IT(&htim7);
+//	}
+	/////////////////////////////////////////////////////////////////////////
+
+//	if(TIM7->TIMx_CNT > 100)
+//	if(HAL_GPIO_ReadPin(GPIOE, encoder_button_Pin) == 0)	// If button pressed
+//	{
+//		klick++;
+//		if(klick >= 4)
+//		{
+//			klick = 0;
+//			HAL_TIM_Base_Stop_IT(&htim7);
+//		}
+//		else
+//		{
+//			HAL_TIM_Base_Stop_IT(&htim7);
+//		}
+//	}
+//	HAL_TIM_Base_Stop_IT(&htim7);
 
   /* USER CODE END TIM7_IRQn 0 */
   HAL_TIM_IRQHandler(&htim7);

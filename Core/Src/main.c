@@ -116,7 +116,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
 
-  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_1);								// Timmer for count UP and DOWN
+  __HAL_TIM_SET_COUNTER(&htim1, 0);											// Set encoder in 0
 
   while (1)
   {
@@ -126,7 +127,7 @@ int main(void)
 	  		  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_SET);
 	  		  HAL_GPIO_WritePin(GPIOD, LD4_Pin, GPIO_PIN_RESET);
 
-	  		__HAL_TIM_SET_COUNTER(&htim1, 0);
+	  		  __HAL_TIM_SET_COUNTER(&htim1, 0);								// Start count encoder from 0
 
 	  		  while(klick == 0)
 	  		  {
@@ -135,13 +136,11 @@ int main(void)
 
 	  			  if(currCounter != prevCounter)
 	  			  {
-	  				  if(currCounter > 100)
+	  				  if(currCounter > 100)									// Encoder count from 0 to 100
 	  				  {
 	  					  __HAL_TIM_SET_COUNTER(&htim1, 0);
 	  				  }
-
 	  				  prevCounter = currCounter;
-
 	  			  }
 	  		  }
 
@@ -151,7 +150,7 @@ int main(void)
 	  		  HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_SET);
 	  		  HAL_GPIO_WritePin(GPIOD, LD6_Pin, GPIO_PIN_RESET);
 
-	  		  __HAL_TIM_SET_COUNTER(&htim1, 0);
+	  		  __HAL_TIM_SET_COUNTER(&htim1, 0);								// Start count encoder from 0
 
 	  		 while(klick == 1)
 	  		 {
@@ -162,7 +161,7 @@ int main(void)
 	  			 {
 	  				 if(currCounter > 10)
 	  				 {
-	  					 __HAL_TIM_SET_COUNTER(&htim1, 0);
+	  					 __HAL_TIM_SET_COUNTER(&htim1, 0);					// Encoder count from 0 to 10
 	  				 }
 
 	  				 prevCounter = currCounter;
@@ -176,7 +175,7 @@ int main(void)
 	  		 HAL_GPIO_WritePin(GPIOD, LD3_Pin, GPIO_PIN_SET);
 	  		 HAL_GPIO_WritePin(GPIOD, LD5_Pin, GPIO_PIN_RESET);
 
-	  		 __HAL_TIM_SET_COUNTER(&htim1, 0);
+	  		 __HAL_TIM_SET_COUNTER(&htim1, 1);								// Start count encoder from 1
 
 	  		 while(klick == 2)
 	  		 {
@@ -187,7 +186,7 @@ int main(void)
 	  			 {
 	  				 if(currCounter > 31)
 	  				 {
-	  					 __HAL_TIM_SET_COUNTER(&htim1, 0);
+	  					 __HAL_TIM_SET_COUNTER(&htim1, 0);					// Encoder count from 1 to 32
 	  				 }
 
 	  				 prevCounter = currCounter;
@@ -446,15 +445,15 @@ static void MX_TIM7_Init(void)
 
   /* USER CODE END TIM7_Init 1 */
   htim7.Instance = TIM7;
-  htim7.Init.Prescaler = 84;
+  htim7.Init.Prescaler = 8400-1;
   htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim7.Init.Period = 10000;
+  htim7.Init.Period = 100-1;
   htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_ENABLE;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
   {
